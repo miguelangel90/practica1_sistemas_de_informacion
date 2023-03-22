@@ -1,16 +1,11 @@
-# This is a sample Python script.
+import sqlite3
 
-# Press Mayús+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+con = sqlite3.connect('p1.db')
 
+cursor = con.cursor()
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+cursor.execute("CREATE TABLE IF NOT EXISTS dispositivo (id text primary key, ip text, localizacion text, responsable integer, analisis integer)")
+cursor.execute("CREATE TABLE IF NOT EXISTS analisis (id integer primary key AUTOINCREMENT, puertos_abiertos text, servicios integer, servicios_inseguros integer, vulnerabilidades_detectadas integer)")
+cursor.execute("CREATE TABLE IF NOT EXISTS responsable (nombre text primary key, tlf integer, rol text)")
+cursor.execute("CREATE TABLE IF NOT EXISTS puerto (id integer primary key AUTOINCREMENT, nombre text, analisis_id integer)")
+con.commit()
