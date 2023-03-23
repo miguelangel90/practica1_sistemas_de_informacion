@@ -18,6 +18,8 @@ cursor.execute('PRAGMA foreign_keys = ON')
 
 con.commit()
 
+## CREAMOS LAS TABLAS ##
+
 cursor.execute("CREATE TABLE IF NOT EXISTS puerto (id integer primary key AUTOINCREMENT, nombre text not null, analisis_id integer, "
                "FOREIGN KEY (analisis_id) REFERENCES analisis(id))")
 cursor.execute("CREATE TABLE IF NOT EXISTS analisis (id integer primary key AUTOINCREMENT, dispositivo text, puertos_abiertos int, servicios integer not null, servicios_inseguros integer not null, vulnerabilidades_detectadas integer not null, "
@@ -29,17 +31,38 @@ cursor.execute("CREATE TABLE IF NOT EXISTS dispositivo (id text primary key, ip 
 con.commit()
 
 i = 1
+
+## INSERTAMOS LOS DATOS
 for objeto in datos:
+
+    ## TABLA RESPONSABLE
     nombre_responsable = objeto['responsable']['nombre']
     tlf_responsable = objeto['responsable']['telefono']
     rol_responsable = objeto['responsable']['rol']
     cursor.execute("INSERT OR IGNORE INTO responsable VALUES (?, ?, ?)", (nombre_responsable, tlf_responsable, rol_responsable))
+
+    ## TABLA DISPOSITIVO
     id_dispositivo = objeto['id']
     ip_dispositivo = objeto['ip']
     localizacion_dispositivo = objeto['localizacion']
     cursor.execute("INSERT INTO dispositivo VALUES (?, ?, ?, ?)", (id_dispositivo, ip_dispositivo, localizacion_dispositivo, nombre_responsable))
+
+    ## TABLA ANALISIS
+    id_analisis= i
+    ## id_dispositivo
+    puerto_abierto=objeto["analisis"]["puertos_abiertos"]
+    servicio_normal=objeto["analisis"]["servicios"]
+    servicio_inseguro= objeto["analisis"]["servicios_inseguros"]
+    vulnerabilidad_detectada=objeto["analisis"]["vulnerabilidades_detectadas"]
+    cursor.execute("INSERT INTO dispositivo VALUES (?, ?, ?, ?,?,?)",(id_analisis, ip_dispositivo, puerto_abierto, servicio_normal, servicio_inseguro, vulnerabilidad_detectada))
+
+
+    ## TABLA PUERTOS
+    id_puerto= i
+
     #print(objeto['analisis']['puertos_abiertos'], i)
     #for puerto in objeto['analisis']['puertos_abiertos']:
      #   cursor.execute("INSERT INTO puerto VALUES (nombre, analisis_id)", (puerto, i))
+
     i = i + 1
     con.commit()
