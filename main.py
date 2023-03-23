@@ -49,7 +49,7 @@ for objeto in datos:
 
     ## TABLA ANALISIS
     id_analisis= i
-    ## id_dispositivo
+    ## id_dispositivo=
     puerto_abierto=objeto["analisis"]["puertos_abiertos"]
     servicio_normal=objeto["analisis"]["servicios"]
     servicio_inseguro= objeto["analisis"]["servicios_inseguros"]
