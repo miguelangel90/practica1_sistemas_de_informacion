@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import csv
 
 con = sqlite3.connect('p1.db')
 
@@ -7,12 +8,14 @@ with open('devices.json') as f:
     datos = json.load(f)
 
 
+
 cursor = con.cursor()
 
-cursor.execute("DROP TABLE puerto")
-cursor.execute("DROP TABLE analisis")
-cursor.execute("DROP TABLE dispositivo")
-cursor.execute("DROP TABLE responsable")
+#cursor.execute("DROP TABLE puerto")
+#cursor.execute("DROP TABLE analisis")
+#cursor.execute("DROP TABLE dispositivo")
+#cursor.execute("DROP TABLE responsable")
+#cursor.execute("DROP TABLE alertas")
 
 cursor.execute('PRAGMA foreign_keys = ON')
 
@@ -25,7 +28,7 @@ cursor.execute("CREATE TABLE IF NOT EXISTS analisis (id integer primary key AUTO
 cursor.execute("CREATE TABLE IF NOT EXISTS responsable (nombre text primary key, tlf integer, rol text )")
 cursor.execute("CREATE TABLE IF NOT EXISTS dispositivo (id text primary key, ip text not null, localizacion text, responsable text, "
                "FOREIGN KEY(responsable) REFERENCES responsable(nombre))")
-
+cursor.execute("CREATE TABLE IF NOT EXISTS alerta (id integer primary key AUTOINCREMENT,fecha_hora text not null,sid integer not null,msg text not null,clasificacion text not null,prioridad text not null,protocolo text not null,origen text not null,destino text not null,puerto integer not null)")
 con.commit()
 
 i = 1
@@ -63,6 +66,15 @@ for objeto in datos:
     else:
         for puerto_nuevo in objeto["analisis"]["puertos_abiertos"]:
             cursor.execute("INSERT INTO puerto(nombre, analisis_id) VALUES (?, ?)",(puerto_nuevo, id_analisis))
+
+# IMPORTAMOS EL CSV
+with open('alerts.csv', 'r') as csvfile:
+    csvreader = csv.reader(csvfile)
+    tam= len(csvreader)
+    for row in csvreader:
+        cursor.execute('INSERT INTO alerta (fecha_hora, sid, msg, clasificacion, prioridad, protocolo, origen, destino, puerto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', row)
+
+    ## TABLA ALERTAS
 
 
 
