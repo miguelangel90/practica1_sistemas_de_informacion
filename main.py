@@ -58,7 +58,12 @@ for objeto in datos:
 
 
     ## TABLA PUERTOS
-    id_puerto= i
+    id_puerto= 0
+    ## id_analisis= i
+    for puerto_nuevo in objeto["analisis"]["puertos_abiertos"]:
+        cursor.execute("INSERT INTO dispositivo VALUES (?, ?, ?)",(id_puerto, puerto_nuevo, id_analisis))
+        id_puerto= id_puerto+1
+
 
     #print(objeto['analisis']['puertos_abiertos'], i)
     #for puerto in objeto['analisis']['puertos_abiertos']:
