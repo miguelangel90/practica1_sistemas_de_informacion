@@ -8,5 +8,17 @@
       <jdbc-url>jdbc:sqlite:C:\Users\USUARIO\PycharmProjects\practica1_sistemas_de_informacion\p1.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="p1" uuid="0d5a8021-77d5-4084-9c66-989fb2334757">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\migue\OneDrive\Escritorio\UNIVERSIDAD\TERCERO\SISTEMAS DE INFORMACION\practica\p1.db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.40.1/sqlite-jdbc-3.40.1.jar</url>
+        </library>
+      </libraries>
+    </data-source>
   </component>
 </project>
