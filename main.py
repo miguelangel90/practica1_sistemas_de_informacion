@@ -28,7 +28,7 @@ cursor.execute("CREATE TABLE IF NOT EXISTS dispositivo (id text primary key, ip 
 
 con.commit()
 
-
+i = 0
 ## INSERTAMOS LOS DATOS
 for objeto in datos:
 
@@ -51,14 +51,14 @@ for objeto in datos:
     servicio_normal=objeto["analisis"]["servicios"]
     servicio_inseguro= objeto["analisis"]["servicios_inseguros"]
     vulnerabilidad_detectada=objeto["analisis"]["vulnerabilidades_detectadas"]
-    cursor.execute("INSERT INTO dispositivo VALUES (?, ?, ?, ?,?,?)",(id_analisis, ip_dispositivo, puerto_abierto, servicio_normal, servicio_inseguro, vulnerabilidad_detectada))
+    cursor.execute("INSERT INTO analisis VALUES (?, ?, ?, ?,?,?)",(id_analisis, ip_dispositivo, puerto_abierto, servicio_normal, servicio_inseguro, vulnerabilidad_detectada))
 
 
     ## TABLA PUERTOS
     id_puerto= 0
     ## id_analisis= i
     for puerto_nuevo in objeto["analisis"]["puertos_abiertos"]:
-        cursor.execute("INSERT INTO dispositivo VALUES (?, ?, ?)",(id_puerto, puerto_nuevo, id_analisis))
+        cursor.execute("INSERT INTO puerto VALUES (?, ?, ?)",(id_puerto, puerto_nuevo, id_analisis))
         id_puerto= id_puerto+1
 
 
