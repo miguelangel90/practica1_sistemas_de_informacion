@@ -65,5 +65,7 @@ for objeto in datos:
             cursor.execute("INSERT INTO puerto(nombre, analisis_id) VALUES (?, ?)",(puerto_nuevo, id_analisis))
 
 
+
+
     i = i + 1
     con.commit()
