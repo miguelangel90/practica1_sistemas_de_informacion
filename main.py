@@ -79,5 +79,7 @@ with open('alerts.csv', 'r') as csvfile:
 
 
 
+
+
     i = i + 1
     con.commit()
