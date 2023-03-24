@@ -1,6 +1,8 @@
 import sqlite3
 import json
 import csv
+import pandas as pd
+import numpy as np
 
 con = sqlite3.connect('p1.db')
 
@@ -67,6 +69,9 @@ for objeto in datos:
         for puerto_nuevo in objeto["analisis"]["puertos_abiertos"]:
             cursor.execute("INSERT INTO puerto(nombre, analisis_id) VALUES (?, ?)",(puerto_nuevo, id_analisis))
 
+    i = i + 1
+    con.commit()
+
 # IMPORTAMOS EL CSV
 with open('alerts.csv', 'r') as csvfile:
     csvreader = csv.reader(csvfile)
@@ -74,12 +79,47 @@ with open('alerts.csv', 'r') as csvfile:
     for row in csvreader:
         cursor.execute('INSERT INTO alerta (fecha_hora, sid, msg, clasificacion, prioridad, protocolo, origen, destino, puerto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', row)
 
-    ## TABLA ALERTAS
 
 
+##  EJERCICIO 2
+
+df = pd.read_sql_query('SELECT COUNT(id) FROM dispositivo', con)
+print("Numero de dispositivos:")
+print(df)
+
+df = pd.read_sql_query('SELECT COUNT(id) FROM alerta', con)
+print("Numero de alertas:")
+print(df)
+
+df = pd.read_sql_query('SELECT analisis_id FROM puerto', con)
+media = df['analisis_id'].dropna().mean()
+desviacion = df['analisis_id'].dropna().std()
+print('Media:', media)
+print('Desviación estándar:', desviacion)
 
 
+df = pd.read_sql_query('SELECT servicios_inseguros FROM analisis', con)
+media = df['servicios_inseguros'].dropna().mean()
+desviacion = df['servicios_inseguros'].dropna().std()
+print('Media servicios_inseguros:', media)
+print('Desviación estándar servicios_inseguros:', desviacion)
 
+df = pd.read_sql_query('SELECT vulnerabilidades_detectadas FROM analisis', con)
+media = df['vulnerabilidades_detectadas'].dropna().mean()
+desviacion = df['vulnerabilidades_detectadas'].dropna().std()
+print('Media vulnerabilidades_detectadas:', media)
+print('Desviación estándar vulnerabilidades_detectadas:', desviacion)
 
-    i = i + 1
-    con.commit()
+#df = pd.read_sql_query('SELECT nombre, COUNT(nombre) FROM puerto GROUP BY nombre', con)
+df = pd.read_sql_query('SELECT * FROM puerto', con)
+print("Valor minimo y valor maximo del total de puertos abiertos")
+conteo = df['nombre'].value_counts()
+maximo = conteo.idxmax()
+minimo = conteo.idxmin()
+print(f'El valor máximo es {conteo[maximo]}')
+print(f'El valor mínimo es {conteo[minimo]}')
+
+df_max = pd.read_sql_query('SELECT MAX(vulnerabilidades_detectadas) FROM analisis', con)
+df_min = pd.read_sql_query('SELECT MIN(vulnerabilidades_detectadas) FROM analisis', con)
+print(df_max)
+print(df_min)
