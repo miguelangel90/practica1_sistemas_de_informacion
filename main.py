@@ -85,15 +85,19 @@ df = pd.read_sql_query('SELECT COUNT(id) FROM dispositivo', con)
 print("Numero de dispositivos:")
 print(df)
 
+df = pd.read_sql_query("SELECT COUNT(*) FROM ALERTA WHERE MSG LIKE '%issing%'", con)
+print("Numero de missings:")
+print(df)
+
 df = pd.read_sql_query('SELECT COUNT(id) FROM alerta', con)
 print("Numero de alertas:")
 print(df)
 
-df = pd.read_sql_query('SELECT analisis_id FROM puerto', con)
-media = df['analisis_id'].dropna().mean()
-desviacion = df['analisis_id'].dropna().std()
-print('Media:', media)
-print('Desviación estándar:', desviacion)
+df = pd.read_sql_query('SELECT COUNT(analisis_id) as nPuertos FROM puerto GROUP BY analisis_id', con)
+media = df['nPuertos'].dropna().mean()
+desviacion = df['nPuertos'].dropna().std()
+print('Media del total puertos abiertos:', media)
+print('Desviación estándar del total puertos abiertos:', desviacion)
 
 
 df = pd.read_sql_query('SELECT servicios_inseguros FROM analisis', con)
@@ -108,19 +112,42 @@ desviacion = df['vulnerabilidades_detectadas'].dropna().std()
 print('Media vulnerabilidades_detectadas:', media)
 print('Desviación estándar vulnerabilidades_detectadas:', desviacion)
 
-#df = pd.read_sql_query('SELECT nombre, COUNT(nombre) FROM puerto GROUP BY nombre', con)
-df = pd.read_sql_query('SELECT * FROM puerto', con)
-print("Valor minimo y valor maximo del total de puertos abiertos")
-conteo = df['nombre'].value_counts()
-maximo = conteo.idxmax()
-minimo = conteo.idxmin()
-print(f'El valor máximo es {conteo[maximo]}')
-print(f'El valor mínimo es {conteo[minimo]}')
+df = pd.read_sql_query('SELECT COUNT(analisis_id) as nPuertos FROM puerto GROUP BY analisis_id', con)
+print("Valor minimo y valor maximo del total de puertos abiertos:")
+#conteo = df['nPuertos'].value_counts()
+maximo = df['nPuertos'].max()
+minimo = df['nPuertos'].min()
+print('El valor máximo es: ', str(maximo))
+print('El valor mínimo es: ', str(minimo))
 
-df_max = pd.read_sql_query('SELECT MAX(vulnerabilidades_detectadas) FROM analisis', con)
-df_min = pd.read_sql_query('SELECT MIN(vulnerabilidades_detectadas) FROM analisis', con)
-print(df_max)
-print(df_min)
+df = pd.read_sql_query('SELECT vulnerabilidades_detectadas FROM analisis', con)
+maximo = df['vulnerabilidades_detectadas'].max()
+minimo = df['vulnerabilidades_detectadas'].min()
+print("VValor minimo y valor maximo del numero de vulnerabilidades detectadas:")
+print('El valor máximo es: ', str(maximo))
+print('El valor mínimo es: ', str(minimo))
+
+
+## EJERCICIO 3
+
+## Por prioridad
+
+df = pd.read_sql_query('SELECT prioridad, COUNT(*) as nAlertas, SUM(vulnerabilidades_detectadas) FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo GROUP BY prioridad', con)
+print("Numero de observaciones:")
+print(df)
+
+df = pd.read_sql_query("SELECT prioridad, COUNT(*) as nMissings FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo  WHERE MSG LIKE '%issing%' GROUP BY prioridad", con)
+print("Numero de missings:")
+print(df)
+
+df = pd.read_sql_query("SELECT vulnerabilidades_detectadas FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo GROUP BY prioridad", con)
+mediana = df['vulnerabilidades_detectadas'].median()
+
+print('La mediana de vulnerabilidades detectadas es: ', mediana)
+
+df = pd.read_sql_query("SELECT prioridad, AVG(vulnerabilidades_detectadas) as Media_de_vulnerabilidades_detectadas FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo GROUP BY prioridad", con)
+print(df)
+
 
 
 con.close()
