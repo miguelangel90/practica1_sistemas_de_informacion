@@ -63,12 +63,9 @@ for objeto in datos:
 
 
     ## TABLA PUERTOS
-    if objeto["analisis"]["puertos_abiertos"] == "None":
-        cursor.execute("INSERT INTO puerto(nombre, analisis_id) VALUES (?, ?)", (None, id_analisis))
-    else:
+    if objeto["analisis"]["puertos_abiertos"] != "None":
         for puerto_nuevo in objeto["analisis"]["puertos_abiertos"]:
-            cursor.execute("INSERT INTO puerto(nombre, analisis_id) VALUES (?, ?)",(puerto_nuevo, id_analisis))
-
+            cursor.execute("INSERT INTO puerto(nombre, analisis_id) VALUES (?, ?)", (puerto_nuevo, id_analisis))
     i = i + 1
     con.commit()
 
@@ -79,6 +76,7 @@ with open('alerts.csv', 'r') as csvfile:
     for row in csvreader:
         cursor.execute('INSERT INTO alerta (fecha_hora, sid, msg, clasificacion, prioridad, protocolo, origen, destino, puerto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', row)
 
+    con.commit()
 
 
 ##  EJERCICIO 2
@@ -123,3 +121,6 @@ df_max = pd.read_sql_query('SELECT MAX(vulnerabilidades_detectadas) FROM analisi
 df_min = pd.read_sql_query('SELECT MIN(vulnerabilidades_detectadas) FROM analisis', con)
 print(df_max)
 print(df_min)
+
+
+con.close()
