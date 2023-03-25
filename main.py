@@ -127,6 +127,7 @@ print("VValor minimo y valor maximo del numero de vulnerabilidades detectadas:")
 print('El valor máximo es: ', str(maximo))
 print('El valor mínimo es: ', str(minimo))
 
+con.commit()
 
 ## EJERCICIO 3
 
@@ -148,6 +149,56 @@ print('La mediana de vulnerabilidades detectadas es: ', mediana)
 df = pd.read_sql_query("SELECT prioridad, AVG(vulnerabilidades_detectadas) as Media_de_vulnerabilidades_detectadas FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo GROUP BY prioridad", con)
 print(df)
 
+df = pd.read_sql_query("SELECT prioridad, vulnerabilidades_detectadas as Varianza_de_vulnerabilidades_detectadas FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
+df = df.groupby('prioridad')['Varianza_de_vulnerabilidades_detectadas'].var()
+print(df)
 
+con.commit()
+
+df = pd.read_sql_query("SELECT prioridad, vulnerabilidades_detectadas  FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
+df = df.groupby('prioridad')['vulnerabilidades_detectadas'].agg(['max', 'min'])
+print(df)
+
+
+## Por fecha
+
+df = pd.read_sql_query('SELECT alerta.id, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo', con)
+# Convertir la columna fecha_hora a un objeto datetime
+df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
+# Agrupar los datos por mes y contar el número total de registros
+df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['id'].count()
+# Imprimir el DataFrame con los resultados
+print("Numero de observaciones")
+print(df)
+
+df = pd.read_sql_query("SELECT alerta.id, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo WHERE MSG LIKE '%issing%'", con)
+df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
+df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['id'].count()
+print("Numero de missings")
+print(df)
+
+df = pd.read_sql_query("SELECT vulnerabilidades_detectadas, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
+df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
+df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['vulnerabilidades_detectadas'].median()
+print("Mediana por mes")
+print(df)
+
+df = pd.read_sql_query("SELECT vulnerabilidades_detectadas, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
+df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
+df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['vulnerabilidades_detectadas'].mean()
+print("Media por mes")
+print(df)
+
+df = pd.read_sql_query("SELECT vulnerabilidades_detectadas, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
+df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
+df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['vulnerabilidades_detectadas'].var()
+print("Varianza por mes")
+print(df)
+
+df = pd.read_sql_query("SELECT vulnerabilidades_detectadas, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
+df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
+df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['vulnerabilidades_detectadas'].agg(['max', 'min'])
+print("Maximo y minimo por mes")
+print(df)
 
 con.close()
