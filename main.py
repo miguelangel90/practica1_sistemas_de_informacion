@@ -2,6 +2,7 @@ import sqlite3
 import json
 import csv
 import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
 
 con = sqlite3.connect('p1.db')
@@ -163,11 +164,8 @@ print(df)
 ## Por fecha
 
 df = pd.read_sql_query('SELECT alerta.id, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo', con)
-# Convertir la columna fecha_hora a un objeto datetime
 df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
-# Agrupar los datos por mes y contar el número total de registros
 df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['id'].count()
-# Imprimir el DataFrame con los resultados
 print("Numero de observaciones")
 print(df)
 
@@ -200,5 +198,41 @@ df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
 df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['vulnerabilidades_detectadas'].agg(['max', 'min'])
 print("Maximo y minimo por mes")
 print(df)
+
+## EJERCICIO 4
+
+df = pd.read_sql_query("SELECT origen, COUNT(*) AS cantidad_alertas FROM alerta WHERE prioridad = 1 GROUP BY origen ORDER BY cantidad_alertas DESC LIMIT 10", con)
+print(df)
+plt.bar(df['origen'], df['cantidad_alertas'])
+plt.xlabel('IP de origen')
+plt.ylabel('Cantidad de alertas')
+plt.title('Las 10 IP de origen más problematicas')
+plt.show()
+
+df = pd.read_sql_query('SELECT fecha_hora FROM alerta ', con)
+df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
+df.set_index('fecha_hora', inplace=True)
+alertas_por_dia = df.resample('D').size()
+alertas_por_dia.plot()
+plt.xlabel('Fecha')
+plt.ylabel('Número de alertas')
+plt.title('Número de alertas por día')
+plt.show()
+
+df = pd.read_sql_query("SELECT prioridad, COUNT(*) AS cantidad_alertas FROM alerta GROUP BY prioridad ", con)
+plt.bar(df['prioridad'], df['cantidad_alertas'])
+plt.xlabel('Prioridad')
+plt.ylabel('Cantidad de alertas')
+plt.title('Numero de alertas por prioridad')
+plt.show()
+
+df = pd.read_sql_query("SELECT dispositivo, servicios_inseguros + vulnerabilidades_detectadas AS servicios_vulnerables FROM analisis", con)
+plt.bar(df['dispositivo'], df['servicios_vulnerables'])
+plt.xlabel('Dispositivos')
+plt.ylabel('Servicios vulnerables')
+plt.title('Dispositivos mas vulnerables')
+plt.show()
+
+
 
 con.close()
