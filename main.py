@@ -3,7 +3,8 @@ import json
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.pyplot as plt
+
 
 con = sqlite3.connect('p1.db')
 
@@ -82,23 +83,33 @@ with open('alerts.csv', 'r') as csvfile:
 
 ##  EJERCICIO 2
 
+print("*********************** EJERCICIO 2 ***********************")
+
 df = pd.read_sql_query('SELECT COUNT(id) FROM dispositivo', con)
 print("Numero de dispositivos:")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT COUNT(*) FROM ALERTA WHERE MSG LIKE '%issing%'", con)
 print("Numero de missings:")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query('SELECT COUNT(id) FROM alerta', con)
 print("Numero de alertas:")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query('SELECT COUNT(analisis_id) as nPuertos FROM puerto GROUP BY analisis_id', con)
 media = df['nPuertos'].dropna().mean()
 desviacion = df['nPuertos'].dropna().std()
 print('Media del total puertos abiertos:', media)
 print('Desviación estándar del total puertos abiertos:', desviacion)
+print("***********************************************************")
+
 
 
 df = pd.read_sql_query('SELECT servicios_inseguros FROM analisis', con)
@@ -106,20 +117,25 @@ media = df['servicios_inseguros'].dropna().mean()
 desviacion = df['servicios_inseguros'].dropna().std()
 print('Media servicios_inseguros:', media)
 print('Desviación estándar servicios_inseguros:', desviacion)
+print("***********************************************************")
+
 
 df = pd.read_sql_query('SELECT vulnerabilidades_detectadas FROM analisis', con)
 media = df['vulnerabilidades_detectadas'].dropna().mean()
 desviacion = df['vulnerabilidades_detectadas'].dropna().std()
 print('Media vulnerabilidades_detectadas:', media)
 print('Desviación estándar vulnerabilidades_detectadas:', desviacion)
+print("***********************************************************")
+
 
 df = pd.read_sql_query('SELECT COUNT(analisis_id) as nPuertos FROM puerto GROUP BY analisis_id', con)
 print("Valor minimo y valor maximo del total de puertos abiertos:")
-#conteo = df['nPuertos'].value_counts()
 maximo = df['nPuertos'].max()
 minimo = df['nPuertos'].min()
 print('El valor máximo es: ', str(maximo))
 print('El valor mínimo es: ', str(minimo))
+print("***********************************************************")
+
 
 df = pd.read_sql_query('SELECT vulnerabilidades_detectadas FROM analisis', con)
 maximo = df['vulnerabilidades_detectadas'].max()
@@ -127,79 +143,106 @@ minimo = df['vulnerabilidades_detectadas'].min()
 print("VValor minimo y valor maximo del numero de vulnerabilidades detectadas:")
 print('El valor máximo es: ', str(maximo))
 print('El valor mínimo es: ', str(minimo))
+print("***********************************************************")
+
 
 con.commit()
 
 ## EJERCICIO 3
 
+print("*********************** EJERCICIO 3 ***********************")
 ## Por prioridad
+print("POR PRIORIDAD")
 
 df = pd.read_sql_query('SELECT prioridad, COUNT(*) as nAlertas, SUM(vulnerabilidades_detectadas) FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo GROUP BY prioridad', con)
 print("Numero de observaciones:")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT prioridad, COUNT(*) as nMissings FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo  WHERE MSG LIKE '%issing%' GROUP BY prioridad", con)
 print("Numero de missings:")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT vulnerabilidades_detectadas FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo GROUP BY prioridad", con)
 mediana = df['vulnerabilidades_detectadas'].median()
-
 print('La mediana de vulnerabilidades detectadas es: ', mediana)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT prioridad, AVG(vulnerabilidades_detectadas) as Media_de_vulnerabilidades_detectadas FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo GROUP BY prioridad", con)
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT prioridad, vulnerabilidades_detectadas as Varianza_de_vulnerabilidades_detectadas FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
 df = df.groupby('prioridad')['Varianza_de_vulnerabilidades_detectadas'].var()
 print(df)
-
-con.commit()
+print("***********************************************************")
 
 df = pd.read_sql_query("SELECT prioridad, vulnerabilidades_detectadas  FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
 df = df.groupby('prioridad')['vulnerabilidades_detectadas'].agg(['max', 'min'])
 print(df)
+print("***********************************************************")
 
 
+con.commit()
 ## Por fecha
+print("POR FECHA")
 
 df = pd.read_sql_query('SELECT alerta.id, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo', con)
 df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
 df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['id'].count()
 print("Numero de observaciones")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT alerta.id, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo WHERE MSG LIKE '%issing%'", con)
 df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
 df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['id'].count()
 print("Numero de missings")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT vulnerabilidades_detectadas, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
 df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
 df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['vulnerabilidades_detectadas'].median()
 print("Mediana por mes")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT vulnerabilidades_detectadas, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
 df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
 df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['vulnerabilidades_detectadas'].mean()
 print("Media por mes")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT vulnerabilidades_detectadas, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
 df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
 df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['vulnerabilidades_detectadas'].var()
 print("Varianza por mes")
 print(df)
+print("***********************************************************")
+
 
 df = pd.read_sql_query("SELECT vulnerabilidades_detectadas, fecha_hora FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
 df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
 df = df.groupby(df['fecha_hora'].dt.strftime('%Y-%m'))['vulnerabilidades_detectadas'].agg(['max', 'min'])
 print("Maximo y minimo por mes")
 print(df)
+print("***********************************************************")
+
 
 ## EJERCICIO 4
+print("*********************** EJERCICIO 4 ***********************")
+
 
 df = pd.read_sql_query("SELECT origen, COUNT(*) AS cantidad_alertas FROM alerta WHERE prioridad = 1 GROUP BY origen ORDER BY cantidad_alertas DESC LIMIT 10", con)
 print(df)
@@ -208,6 +251,7 @@ plt.xlabel('IP de origen')
 plt.ylabel('Cantidad de alertas')
 plt.title('Las 10 IP de origen más problematicas')
 plt.show()
+
 
 df = pd.read_sql_query('SELECT fecha_hora FROM alerta ', con)
 df['fecha_hora'] = pd.to_datetime(df['fecha_hora'])
@@ -232,7 +276,5 @@ plt.xlabel('Dispositivos')
 plt.ylabel('Servicios vulnerables')
 plt.title('Dispositivos mas vulnerables')
 plt.show()
-
-
 
 con.close()
