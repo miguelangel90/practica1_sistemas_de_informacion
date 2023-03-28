@@ -157,7 +157,7 @@ print("*********************** EJERCICIO 3 ***********************")
 print("POR PRIORIDAD")
 
 df = pd.read_sql_query('SELECT prioridad, COUNT(*) as nAlertas, SUM(vulnerabilidades_detectadas) as total_vulnerabilidades '
-                       'FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo'
+                       'FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo '
                        'GROUP BY prioridad', con)
 print("Numero de observaciones:")
 print(df)
@@ -165,7 +165,7 @@ print("***********************************************************")
 
 
 df = pd.read_sql_query("SELECT prioridad, COUNT(*) as nMissings "
-                       "FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo"
+                       "FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo "
                        "WHERE MSG LIKE '%issing%' GROUP BY prioridad", con)
 print("Numero de missings:")
 print(df)
@@ -188,7 +188,7 @@ print("***********************************************************")
 
 
 df = pd.read_sql_query("SELECT prioridad, vulnerabilidades_detectadas as Varianza_de_vulnerabilidades_detectadas "
-                       "FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo", con)
+                       "FROM alerta JOIN dispositivo ON dispositivo.ip = alerta.origen OR dispositivo.ip = alerta.destino JOIN analisis a on dispositivo.id = a.dispositivo ", con)
 df = df.groupby('prioridad')['Varianza_de_vulnerabilidades_detectadas'].var()
 print(df)
 print("***********************************************************")
@@ -265,7 +265,6 @@ print("*********************** EJERCICIO 4 ***********************")
 
 df = pd.read_sql_query("SELECT origen, COUNT(*) AS cantidad_alertas "
                        "FROM alerta WHERE prioridad = 1 GROUP BY origen ORDER BY cantidad_alertas DESC LIMIT 10", con)
-print(df)
 plt.figure(figsize=(14.5, 6))
 plt.bar(df['origen'], df['cantidad_alertas'])
 plt.xlabel('IP de origen')
